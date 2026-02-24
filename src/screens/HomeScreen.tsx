@@ -44,7 +44,7 @@ const HomeScreen = () => {
       </header>
 
       {/* Map */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative min-h-0">
         <MapView />
         {/* Gradient overlay at bottom */}
         <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background to-transparent pointer-events-none z-10" />
