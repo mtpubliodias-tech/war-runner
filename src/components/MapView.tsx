@@ -1,12 +1,18 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 const SAO_PAULO_CENTER: [number, number] = [-23.5505, -46.6333];
 
-const MapView = () => {
+interface MapViewProps {
+  onMapReady?: (map: L.Map) => void;
+}
+
+const MapView = ({ onMapReady }: MapViewProps) => {
   const mapRef = useRef<L.Map | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const onMapReadyRef = useRef(onMapReady);
+  onMapReadyRef.current = onMapReady;
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -21,9 +27,10 @@ const MapView = () => {
     L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png").addTo(map);
 
     mapRef.current = map;
-
-    // Force resize after mount
-    setTimeout(() => map.invalidateSize(), 100);
+    setTimeout(() => {
+      map.invalidateSize();
+      onMapReadyRef.current?.(map);
+    }, 100);
 
     return () => {
       map.remove();
