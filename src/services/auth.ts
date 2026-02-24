@@ -1,23 +1,33 @@
-// Auth service placeholder - prepared for future Supabase integration
-
 export interface User {
   id: string;
   email: string;
 }
 
-// Simulated login for now
+const STORAGE_KEY = "warunner_user";
+
+export const getStoredUser = (): User | null => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
+const storeUser = (user: User) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+};
+
 export const loginWithEmail = async (email: string, _password: string): Promise<User> => {
-  // TODO: Replace with Supabase auth
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve({ id: crypto.randomUUID(), email });
+      const user: User = { id: crypto.randomUUID(), email };
+      storeUser(user);
+      resolve(user);
     }, 800);
   });
 };
 
-export const logout = async (): Promise<void> => {
-  // TODO: Replace with Supabase auth
-  return new Promise((resolve) => {
-    setTimeout(resolve, 300);
-  });
+export const logout = (): void => {
+  localStorage.removeItem(STORAGE_KEY);
 };
