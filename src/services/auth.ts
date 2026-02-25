@@ -1,33 +1,31 @@
+// src/services/auth.ts
+
 export interface User {
   id: string;
   email: string;
 }
 
-const STORAGE_KEY = "warunner_user";
+const LS_KEY = "warunner:user";
 
-export const getStoredUser = (): User | null => {
+export const getCurrentUser = (): User | null => {
+  const raw = localStorage.getItem(LS_KEY);
+  if (!raw) return null;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
+    const parsed = JSON.parse(raw);
+    if (!parsed?.id || !parsed?.email) return null;
+    return parsed as User;
   } catch {
     return null;
   }
 };
 
-const storeUser = (user: User) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-};
-
 export const loginWithEmail = async (email: string, _password: string): Promise<User> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const user: User = { id: crypto.randomUUID(), email };
-      storeUser(user);
-      resolve(user);
-    }, 800);
-  });
+  // MVP: auth fake, mas persistente.
+  const user: User = { id: crypto.randomUUID(), email };
+  localStorage.setItem(LS_KEY, JSON.stringify(user));
+  return user;
 };
 
-export const logout = (): void => {
-  localStorage.removeItem(STORAGE_KEY);
+export const logout = async (): Promise<void> => {
+  localStorage.removeItem(LS_KEY);
 };
